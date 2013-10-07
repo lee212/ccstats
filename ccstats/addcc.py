@@ -1,3 +1,5 @@
+import os
+import yaml
 from default import default_value
 import getpass
 from pprint import pprint
@@ -5,6 +7,16 @@ from pprint import pprint
 class addcc:
     def __init__(self):
         self.default_value = default_value()
+
+    def store_info(self):
+        """Write yaml file contains the info"""
+
+        conf_dir = self.default_value.conf_dir
+        conf_file = self.default_value.conf_file
+        if not os.path.exists(conf_dir):
+                os.makedirs(conf_dir)
+        with open(conf_file, 'w') as outfile:
+            outfile.write( yaml.dump(self.__dict__, default_flow_style=False) )
 
     def confirm_info(self):
         self.display_info()
@@ -92,3 +104,4 @@ if __name__ == "__main__":
     obj = addcc()
     obj.ask_info()
     obj.confirm_info()
+    obj.store_info()
