@@ -8,15 +8,45 @@ class addcc:
     def __init__(self):
         self.default_value = default_value()
 
+    def get_uniq_name(self):
+        if self.cloudname in ['openstack', 'eucalyptus', 'nimbus' ]:
+            uniq_name = self.cloudname + "_with_" + self.dbinfo['host'].replace(".", "_")
+        else:
+            uniq_name = self.cloudname
+        return uniq_name
+
     def store_info(self):
         """Write yaml file contains the info"""
 
+        data = { self.get_uniq_name(): self.__dict__ }
+        self.update_yaml(data)
+
+    def update_yaml(self, data):
+
         conf_dir = self.default_value.conf_dir
         conf_file = self.default_value.conf_file
+
+        self.ensure_dir(conf_dir)
+        try:
+            res = self.get_yaml(conf_file)
+        except:
+            res = {}
+        print res
+        print data
+        final = dict(res.items() + data.items())
+        self.set_yaml(conf_file, final)
+
+    def ensure_dir(self, conf_dir):
         if not os.path.exists(conf_dir):
                 os.makedirs(conf_dir)
+
+    def get_yaml(self, conf_file):
+        stream = open(conf_file, 'r')
+        return yaml.load(stream)
+
+    def set_yaml(self, conf_file, data):
         with open(conf_file, 'w') as outfile:
-            outfile.write( yaml.dump(self.__dict__, default_flow_style=False) )
+            outfile.write( yaml.dump(data, default_flow_style=False) )
 
     def confirm_info(self):
         self.display_info()
@@ -71,7 +101,9 @@ class addcc:
         x = raw_input("Which cloud do you want to add? \n" + \
                       "O) (default) Openstack \n" + \
                       "E) Eucalyptus \n" + \
-                      "N) Nimbus \n") or "O"
+                      "N) Nimbus \n" + \
+                     "Or you can simply type your unique cloud name. \n" + \
+                     "For example, sierra_openstack_grizzly") or "O"
 
         self.set_cloudname(x)
         print self.cloudname
@@ -84,7 +116,7 @@ class addcc:
         elif title == "N":
             self.cloudname = "nimbus"
         else:
-            self.cloudname = "openstack"
+            self.cloudname = title
 
     def set_dbinfo(self, db_type, db_host, db_port, db_user, db_pass):
 
