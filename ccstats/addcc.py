@@ -31,8 +31,6 @@ class addcc:
             res = self.get_yaml(conf_file)
         except:
             res = {}
-        print res
-        print data
         final = dict(res.items() + data.items())
         self.set_yaml(conf_file, final)
 
@@ -103,7 +101,7 @@ class addcc:
                       "E) Eucalyptus \n" + \
                       "N) Nimbus \n" + \
                      "Or you can simply type your unique cloud name. \n" + \
-                     "For example, sierra_openstack_grizzly") or "O"
+                     "For example, sierra_openstack_grizzly \n") or "O"
 
         self.set_cloudname(x)
         print self.cloudname
