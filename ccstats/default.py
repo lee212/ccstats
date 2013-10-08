@@ -7,3 +7,11 @@ class default_value:
     HOME = os.environ['HOME']
     conf_dir = HOME + "/" + ".ccstats"
     conf_file = conf_dir + "/" + "ccstats.yaml"
+
+    ccstats_db_type = "mongo"
+    ccstats_db_host = "localhost"
+    ccstats_db_port = 27017
+    ccstats_db_id = "ccstats_admin"
+    ccstats_db_pass = "ccstats_pass"
+    ccstats_db_name = "ccstats"
+

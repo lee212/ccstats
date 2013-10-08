@@ -18,7 +18,7 @@ class addcc:
     def store_info(self):
         """Write yaml file contains the info"""
 
-        data = { self.get_uniq_name(): self.__dict__ }
+        data = { "cloud" : { self.get_uniq_name(): self.__dict__ } }
         self.update_yaml(data)
 
     def update_yaml(self, data):
