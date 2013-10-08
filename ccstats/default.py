@@ -15,3 +15,9 @@ class default_value:
     ccstats_db_pass = "ccstats_pass"
     ccstats_db_name = "ccstats"
 
+    ccstats_metric_type = "mongo"
+    ccstats_metric_host = "localhost"
+    ccstats_metric_port = 27017
+    ccstats_metric_id = "fgmetrics"
+    ccstats_metric_pass = ""
+    ccstats_metric_name = "cloudmetrics"

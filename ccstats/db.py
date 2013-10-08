@@ -10,22 +10,27 @@ from conf import conf
 class ccsDB:
     def __init__(self):
         self.conf = conf()
-
-    def set_dbinfo(self):
-        self.conf.store_dbinfo(self.db)
-        '''
-        get user input
-        write to / update to yaml
-        {stats:
-         mongo host, port, id, pass, dbname }
-         '''
+        self.db = {}
+        self.metric = {}
 
     def _stdin_setup(self):
         """configure database information for storing statistics"""
         self.ask_dbinfo()
-        while not self.confirm_dbinfo():
+        while not self.confirm_info(self.db):
             self.ask_dbinfo()
         self.set_dbinfo()
+
+    def _stdin_metric_setup(self):
+        self.ask_metricinfo()
+        while not self.confirm_info(self.metric):
+            self.ask_metricinfo()
+        self.set_metricinfo()
+
+    def set_dbinfo(self):
+        self.conf.store_dbinfo(self.db)
+
+    def set_metricinfo(self):
+        self.conf.store_metricinfo(self.metric)
 
     def ask_dbinfo(self):
         mgdb_host = stdInput.ask_info("mongo host", dv.ccstats_db_host)
@@ -40,11 +45,24 @@ class ccsDB:
                    "pass": mgdb_pass, \
                    "name": mgdb_name }
 
-    def display_dbinfo(self):
-        pprint.pprint (self.db)
+    def ask_metricinfo(self):
+        metric_host = stdInput.ask_info("metric host", dv.ccstats_metric_host)
+        metric_port = stdInput.ask_info("metric port", dv.ccstats_metric_port) 
+        metric_id = stdInput.ask_info("metric id", dv.ccstats_metric_id)
+        metric_pass = stdInput.ask_info("metric pass", pwd=True)
+        metric_name = stdInput.ask_info("metric db name", dv.ccstats_metric_name)
 
-    def confirm_dbinfo(self):
-        self.display_dbinfo()
+        self.metric = { "host": metric_host, \
+                   "port": metric_port, \
+                   "id": metric_id, \
+                   "pass": metric_pass, \
+                   "name": metric_name }
+
+    def display_info(self, info):
+        pprint.pprint (info)
+
+    def confirm_info(self, info):
+        self.display_info(info)
         return self.ask_confirm()
 
     def ask_confirm(self):

@@ -18,6 +18,10 @@ class conf:
         data = { "ccstats" : info }
         self.update_yaml(data)
 
+    def store_metricinfo(self, info):
+        data = { "cloudmetrics": info }
+        self.update_yaml(data)
+
     def update_yaml(self, data):
 
         conf_dir = self.dv.conf_dir
