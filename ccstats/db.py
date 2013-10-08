@@ -1,4 +1,5 @@
-import pymongo
+from pymongo import MongoClient
+#import pymongo
 import pprint
 
 from optparse import OptionParser
@@ -12,6 +13,37 @@ class ccsDB:
         self.conf = conf()
         self.db = {}
         self.metric = {}
+        class free:
+            pass
+        self.conn = free()
+        self.get_dbinfo()
+        self.connect()
+        
+    def connect(self):
+        self.connect_db()
+        self.connect_metric()
+
+    def connect_db(self):
+        uri = "mongodb://%s:%s@%s:%s/%s" % (self.dbinfo['ccstats']['id'], \
+                                            self.dbinfo['ccstats']['pass'], \
+                                            self.dbinfo['ccstats']['host'], \
+                                            self.dbinfo['ccstats']['port'], \
+                                            self.dbinfo['ccstats']['name'] )
+        client = MongoClient(uri)
+        self.conn.db = client
+
+    def connect_metric(self):
+        client = MongoClient(self.dbinfo['cloudmetrics']['host'], \
+                            self.dbinfo['cloudmetrics']['port'])
+        #client.cloudmetrics.authenticate(
+        dbname = self.dbinfo['cloudmetrics']['name']
+        client[dbname].authenticate(
+            self.dbinfo['cloudmetrics']['id'], \
+            self.dbinfo['cloudmetrics']['pass'])
+        self.conn.metric = client
+
+    def get_dbinfo(self):
+        self.dbinfo = self.conf.get_conf()
 
     def _stdin_setup(self):
         """configure database information for storing statistics"""
