@@ -5,17 +5,20 @@ from optparse import OptionParser
 
 from stdin import stdInput
 from default import default_value as dv
+from conf import conf
 
 class ccsDB:
+    def __init__(self):
+        self.conf = conf()
 
     def set_dbinfo(self):
+        self.conf.store_dbinfo(self.db)
         '''
         get user input
         write to / update to yaml
         {stats:
          mongo host, port, id, pass, dbname }
          '''
-        return
 
     def _stdin_setup(self):
         """configure database information for storing statistics"""
