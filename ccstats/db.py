@@ -30,7 +30,8 @@ class ccsDB:
                                             self.dbinfo['ccstats']['port'], \
                                             self.dbinfo['ccstats']['name'] )
         client = MongoClient(uri)
-        self.conn.db = client
+        dbname = self.dbinfo['ccstats']['name']
+        self.conn.db = client[dbname]
 
     def connect_metric(self):
         client = MongoClient(self.dbinfo['cloudmetrics']['host'], \
@@ -40,7 +41,7 @@ class ccsDB:
         client[dbname].authenticate(
             self.dbinfo['cloudmetrics']['id'], \
             self.dbinfo['cloudmetrics']['pass'])
-        self.conn.metric = client
+        self.conn.metric = client[dbname]
 
     def get_dbinfo(self):
         self.dbinfo = self.conf.get_conf()
