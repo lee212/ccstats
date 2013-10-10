@@ -19,6 +19,7 @@ class ccstats:
     # GROUP
     def _group(self, key_name, cond={}):
 
+        # These functions for counting
         reducer = Code("""
                        function(obj, prev) {
                           prev.count++;
@@ -60,7 +61,11 @@ class ccstats:
 
     # search date by weekly, monthly, quarterly
     def weekly_report(self):
+        cond = self.weekly_condition
+        self.weekly_count(cond)
+        self.weekly_walltime(cond)
 
+    def weekly_condition(self):
         # Condition for 7 days
         seven_days_ago = self.get_days_ago(7)
         today = self.get_days_ago(0)
@@ -70,6 +75,9 @@ class ccstats:
                 {"$gt": seven_days_ago, \
                  "$lt": today}}
 
+        return cond
+
+    def weekly_count(self, cond):
         # total_vm_count_lanched_during_a_last_week
         total_vm_count = self._count(cond)
         print total_vm_count
@@ -77,6 +85,23 @@ class ccstats:
         res = self._group("state", cond)
         print res
         # Daily usage
+        res2 = self._group("date", cond)
+        print res2
+
+    def weekly_walltime(self, cond):
+        reducer2 = Code("""                                                       
+                        function(obj, prev){
+                        state = obj.state; 
+                        start = new Date(obj.t_start); 
+                        if (state == "Extant"){
+                        end = new Date();
+                       }else{
+                        end = new Date(obj.t_end)};
+                        walltime= end.getTime() - start.getTime(); 
+                        prev.count++;
+                        prev.total += walltime;
+                       }
+                        """)
 
     def get_days_ago(self, days_to_subtract):
         return str(date.today() - timedelta(days=days_to_subtract))
