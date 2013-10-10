@@ -25,15 +25,16 @@ class ccstats:
                        }
                        """)
 
-        '''if key_name == "date":
-            _key = {}
-            _keyf = """function(doc) {
-            return { date:
-                doc.""" + key_name + """.getDay() } ; } """
+        if key_name == "date":
+            _key = "function(doc) {" + \
+                    "new_date = new Date(doc." + key_name + ");" + \
+                    "var month = new_date.getMonth() + 1;" + \
+                    "var day = new_date.getDate();" + \
+                    "return { date: String(new_date.getFullYear()) + " + \
+                    "(month < 10 ? '0' : '') + month + (day > 10 ? '0': '')" + \
+                    " + day};}"
         else:
-        '''
-        _key = { key_name: True }
-        _keyf = ""
+            _key = { key_name: True }
 
         res = self.dbconn.group(
             key = _key,
@@ -60,6 +61,7 @@ class ccstats:
     # search date by weekly, monthly, quarterly
     def weekly_report(self):
 
+        # Condition for 7 days
         seven_days_ago = self.get_days_ago(7)
         today = self.get_days_ago(0)
 
