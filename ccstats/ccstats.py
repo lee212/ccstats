@@ -1,3 +1,4 @@
+from bson.code import Code
 from datetime import date, timedelta
 
 from db import ccsDB
@@ -15,6 +16,32 @@ class ccstats:
     def _count(self, cond=None):
         return self.dbconn.find(cond).count()
 
+    # GROUP
+    def _group(self, key_name, cond={}):
+
+        reducer = Code("""
+                       function(obj, prev) {
+                          prev.count++;
+                       }
+                       """)
+
+        '''if key_name == "date":
+            _key = {}
+            _keyf = """function(doc) {
+            return { date:
+                doc.""" + key_name + """.getDay() } ; } """
+        else:
+        '''
+        _key = { key_name: True }
+        _keyf = ""
+
+        res = self.dbconn.group(
+            key = _key,
+            condition = cond,
+            initial = { "count": 0 },
+            reduce = reducer)
+        return res
+
     def count_all(self):
         self._count()
 
@@ -25,6 +52,7 @@ class ccstats:
     def count_running_vms_all(self):
         return self._count({"state":"Extant"})
 
+    # sog: sierra_openstack_grizzly
     def count_running_vms_sog(self):
         return self._count({"state":"Extant",\
                             "cloudPlatformIdRef":10})
@@ -38,13 +66,18 @@ class ccstats:
         # Total usage
         cond = { "t_start": \
                 {"$gt": seven_days_ago, \
-                 "$lt": today}})
+                 "$lt": today}}
+
+        # total_vm_count_lanched_during_a_last_week
+        total_vm_count = self._count(cond)
+        print total_vm_count
+
+        res = self._group("state", cond)
+        print res
         # Daily usage
 
-    def get_days_ago(self, days_to_substract):
-        return date.today() - timedelta(days=days_to_subtract)
+    def get_days_ago(self, days_to_subtract):
+        return str(date.today() - timedelta(days=days_to_subtract))
     
     def count_running_vms_sog(self, from_date, to_date):
         return
-
-
