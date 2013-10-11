@@ -35,6 +35,8 @@ class ccstats:
                     "return { date: String(new_date.getFullYear()) + " + \
                     "(month < 10 ? '0' : '') + month + (day > 10 ? '0': '')" + \
                     " + day};}"
+        elif not key_name:
+            _key = {}
         else:
             _key = { key_name: True }
 
@@ -93,22 +95,27 @@ class ccstats:
         print res2
 
     def weekly_walltime(self, cond):
-        reducer2 = Code("""                                                       
+
+        reducer = Code("""                                                       
                         function(obj, prev){
                         state = obj.state; 
                         start = new Date(obj.t_start); 
                         if (state == "Extant"){
-                        end = new Date();
-                       }else{
-                        end = new Date(obj.t_end)};
-                        walltime= end.getTime() - start.getTime(); 
+                           end = new Date();
+                        }else{
+                           end = new Date(obj.t_end)
+                        };
+                        walltime = (end.getTime() - start.getTime()) / 1000; 
                         prev.count++;
                         prev.total += walltime;
                        }
                         """)
 
-        total_walltime = self._group("date", cond, reducer2)
+        total_walltime = self._group("", cond, reducer)
         print total_walltime
+ 
+        daily_walltime = self._group("date", cond, reducer)
+        print daily_walltime
 
     def get_days_ago(self, days_to_subtract):
         return str(date.today() - timedelta(days=days_to_subtract))
