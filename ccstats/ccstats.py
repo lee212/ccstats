@@ -101,7 +101,10 @@ class ccstats:
                         state = obj.state; 
                         start = new Date(obj.t_start); 
                         if (state == "Extant"){
-                           end = new Date();
+                           today = new Date(); 
+                           end = new Date(today.getFullYear(), 
+                                 today.getMonth(),
+                                 today.getDate(),0,0,0)
                         }else{
                            end = new Date(obj.t_end)
                         };
