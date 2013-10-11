@@ -17,14 +17,15 @@ class ccstats:
         return self.dbconn.find(cond).count()
 
     # GROUP
-    def _group(self, key_name, cond={}):
+    def _group(self, key_name, cond={}, reducer=None):
 
-        # These functions for counting
-        reducer = Code("""
-                       function(obj, prev) {
-                          prev.count++;
-                       }
-                       """)
+        if not reducer:
+            # These functions for counting
+            reducer = Code("""
+                           function(obj, prev) {
+                              prev.count++;
+                           }
+                           """)
 
         if key_name == "date":
             _key = "function(doc) {" + \
@@ -40,7 +41,7 @@ class ccstats:
         res = self.dbconn.group(
             key = _key,
             condition = cond,
-            initial = { "count": 0 },
+            initial = { "count": 0 , "total":0 },
             reduce = reducer)
         return res
 
@@ -61,7 +62,7 @@ class ccstats:
 
     # search date by weekly, monthly, quarterly
     def weekly_report(self):
-        cond = self.weekly_condition
+        cond = self.weekly_condition()
         self.weekly_count(cond)
         self.weekly_walltime(cond)
 
@@ -69,6 +70,9 @@ class ccstats:
         # Condition for 7 days
         seven_days_ago = self.get_days_ago(7)
         today = self.get_days_ago(0)
+        print "=" * 50
+        print "Start - End: " + str(seven_days_ago) + " - " + str(today)
+        print "=" * 50
 
         # Total usage
         cond = { "t_start": \
@@ -102,6 +106,9 @@ class ccstats:
                         prev.total += walltime;
                        }
                         """)
+
+        total_walltime = self._group("date", cond, reducer2)
+        print total_walltime
 
     def get_days_ago(self, days_to_subtract):
         return str(date.today() - timedelta(days=days_to_subtract))
