@@ -67,6 +67,7 @@ class ccstats:
         cond = self.weekly_condition()
         self.weekly_count(cond)
         self.weekly_walltime(cond)
+        self.weekly_usercount(cond)
 
     def weekly_condition(self):
         # Condition for 7 days
@@ -119,6 +120,15 @@ class ccstats:
  
         daily_walltime = self._group("date", cond, reducer)
         print daily_walltime
+
+    def weekly_usercount(self, cond):
+        key = "$ownerId"
+        res = self.dbconn.aggregate([{"$match": cond}, \
+                               {"$group": {"_id": key, \
+                                           "tot": {"$sum": 1}}}, \
+                               {"$group": {"_id": 1, \
+                                           "total":{ "$sum": "$tot"}}}])
+        print res
 
     def get_days_ago(self, days_to_subtract):
         return str(date.today() - timedelta(days=days_to_subtract))
