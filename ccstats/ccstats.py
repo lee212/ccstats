@@ -124,10 +124,11 @@ class ccstats:
     def weekly_usercount(self, cond):
         key = "$ownerId"
         res = self.dbconn.aggregate([{"$match": cond}, \
-                               {"$group": {"_id": key, \
-                                           "tot": {"$sum": 1}}}, \
+                               {"$group": {"_id": key }}, \
+                                           #"tot": {"$sum": 1}}}, \
                                {"$group": {"_id": 1, \
-                                           "total":{ "$sum": "$tot"}}}])
+                                           #"total":{ "$sum": "$tot"}}}])
+                                           "total": {"$sum": 1}}}])
         print res
 
     def get_days_ago(self, days_to_subtract):
