@@ -43,7 +43,7 @@ class ccstats:
         res = self.dbconn.group(
             key = _key,
             condition = cond,
-            initial = { "count": 0 , "total":0 },
+            initial = { "count": 0 , "total":0 , "list": []},
             reduce = reducer)
         return res
 
@@ -129,7 +129,17 @@ class ccstats:
                                {"$group": {"_id": 1, \
                                            #"total":{ "$sum": "$tot"}}}])
                                            "total": {"$sum": 1}}}])
-        print res
+
+        reducer = Code("""
+                       function(obj, prev){
+                       ownerid = obj.ownerId;
+                       if (prev.list.indexOf(ownerid) < 0){
+                           prev.list.push(ownerid);
+                       }
+                       prev.count = prev.list.length;
+                      }""")
+        res2 = self._group("date", cond, reducer)
+        print res2
 
     def get_days_ago(self, days_to_subtract):
         return str(date.today() - timedelta(days=days_to_subtract))
