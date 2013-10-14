@@ -33,7 +33,7 @@ class ccstats:
                     "var month = new_date.getMonth() + 1;" + \
                     "var day = new_date.getDate();" + \
                     "return { date: String(new_date.getFullYear()) + " + \
-                    "(month < 10 ? '0' : '') + month + (day > 10 ? '0': '')" + \
+                    "(month < 10 ? '0' : '') + month + (day < 10 ? '0': '')" + \
                     " + day};}"
         elif not key_name:
             _key = {}
